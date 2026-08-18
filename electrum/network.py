@@ -492,7 +492,8 @@ class Network(Logger, NetworkRetryManager[ServerAddr]):
             self.server_peers = parse_servers(server_peers)
             util.trigger_callback('servers', self.get_servers())
         async def get_relay_fee():
-            self.relay_fee = await interface.get_relay_fee()
+            actual_fee = await interface.get_relay_fee()
+            print(f"Actual relay fee for {interface.server}: {actual_fee}")
 
         async with OldTaskGroup() as group:
             await group.spawn(get_banner)
