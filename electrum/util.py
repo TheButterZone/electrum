@@ -51,6 +51,7 @@ from functools import partial
 from abc import abstractmethod, ABC
 import socket
 import enum
+import inspect
 
 import attr
 import aiohttp
@@ -1153,7 +1154,7 @@ def is_subpath(long_path: str, short_path: str) -> bool:
 
 def log_exceptions(func):
     """Decorator to log AND re-raise exceptions."""
-    assert asyncio.iscoroutinefunction(func), 'func needs to be a coroutine'
+    assert inspect.iscoroutinefunction(func), 'func needs to be a coroutine'
     @functools.wraps(func)
     async def wrapper(*args, **kwargs):
         self = args[0] if len(args) > 0 else None
@@ -1173,7 +1174,7 @@ def log_exceptions(func):
 
 def ignore_exceptions(func):
     """Decorator to silently swallow all exceptions."""
-    assert asyncio.iscoroutinefunction(func), 'func needs to be a coroutine'
+    assert inspect.iscoroutinefunction(func), 'func needs to be a coroutine'
     @functools.wraps(func)
     async def wrapper(*args, **kwargs):
         try:

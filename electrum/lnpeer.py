@@ -12,6 +12,7 @@ import time
 from typing import Tuple, Dict, TYPE_CHECKING, Optional, Union, Set, Callable, Awaitable
 from datetime import datetime
 import functools
+import inspect
 
 import aiorpcx
 from aiorpcx import ignore_after
@@ -248,7 +249,7 @@ class Peer(Logger):
         """Makes a message handler non-blocking: while processing the message,
         the message_loop keeps processing subsequent incoming messages asynchronously.
         """
-        assert asyncio.iscoroutinefunction(func), 'func needs to be a coroutine'
+        assert inspect.iscoroutinefunction(func), 'func needs to be a coroutine'
         @functools.wraps(func)
         async def wrapper(self: 'Peer', *args, **kwargs):
             return await self.taskgroup.spawn(func(self, *args, **kwargs))
