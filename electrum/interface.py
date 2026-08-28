@@ -1153,17 +1153,22 @@ class Interface(Logger):
         except aiorpcx.jsonrpc.RPCError as e:
             # The protocol spec says the server itself should already have returned -1
             # if it cannot provide an estimate. "Fulcrum" often sends:
-            #   aiorpcx.jsonrpc.RPCError: (-32603, 'internal error: bitcoind request timed out')
+            #    aiorpcx.jsonrpc.RPCError: (-32603, 'internal error: bitcoind request timed out')
             if e.code == JSONRPC.INTERNAL_ERROR:
                 res = -1
             else:
                 raise
+        except RequestTimedOut:
+            # Catch network timeouts before they surface as unretrieved asyncio task errors
+            res = -1
+        except Exception:
+            # Catch any other unexpected network or RPC failures gracefully
+            res = -1
         # check response
         if res != -1:
             assert_non_negative_int_or_float(res)
             res = int(res * bitcoin.COIN)
         return res
-
 
 def _assert_header_does_not_check_against_any_chain(header: dict) -> None:
     chain_bad = blockchain.check_header(header) if 'mock' not in header else header['mock']['check'](header)
